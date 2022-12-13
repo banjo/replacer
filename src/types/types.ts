@@ -42,5 +42,6 @@ export type HandleLinesCallback = (props: LineCallbackProps) => void;
 export type HandleFilesCallback = (
     output: string,
     filePath: string,
-    replace: ReplaceCallback
+    replace: ReplaceCallback,
+    replaceAll: ReplaceCallback
 ) => void;

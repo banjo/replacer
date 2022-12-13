@@ -6,11 +6,10 @@ import {
     Replacement,
     ReplaceProps
 } from "./types/types";
-import { globby } from "globby";
-import { promises as fs } from "fs";
+import { fileService } from "./services/fileService";
 
 export const replacer = async (files: string[]) => {
-    const fetchedFiles = await globby(files);
+    const fetchedFiles = await fileService.findFiles(files);
     if (fetchedFiles.length === 0) throw new Error("No files found");
 
     const replacements: Replacement[] = [];
@@ -114,9 +113,13 @@ export const replacer = async (files: string[]) => {
 
     const handleFiles = async (callback: HandleFilesCallback) => {
         for (const filePath of fetchedFiles) {
-            const output = await fs.readFile(filePath, "utf8");
-
-            callback(output, filePath, replace({ filePath } as ReplaceProps));
+            const output = await fileService.readFile(filePath);
+            callback(
+                output,
+                filePath,
+                replace({ filePath } as ReplaceProps),
+                replace({ filePath, replaceAll: true } as ReplaceProps)
+            );
         }
     };
 
@@ -146,7 +149,9 @@ export const replacer = async (files: string[]) => {
     };
 
     const commit = async () => {
-        handleFiles(async (output, filePath) => {
+        for (const filePath of fetchedFiles) {
+            const output = await fileService.readFile(filePath);
+
             const replacementsForFile = replacements.filter(
                 (r) => r.filePath === filePath
             );
@@ -195,8 +200,8 @@ export const replacer = async (files: string[]) => {
                 }
             }
 
-            await fs.writeFile(filePath, newOutput);
-        });
+            await fileService.writeFile(filePath, newOutput);
+        }
     };
 
     return { handleFiles, handleLines, files: fetchedFiles, commit };
