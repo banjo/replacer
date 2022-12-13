@@ -127,7 +127,9 @@ export const replacer = async (files: string[]) => {
     };
 
     const handleLines = async (callback: HandleLinesCallback) => {
-        handleFiles(({ output, filePath }) => {
+        for (const filePath of fetchedFiles) {
+            const output = await fileService.readFile(filePath);
+
             const lines = output.split("\n");
             let lineNumber = 1;
             for (const line of lines) {
@@ -148,7 +150,7 @@ export const replacer = async (files: string[]) => {
                 });
                 lineNumber++;
             }
-        });
+        }
     };
 
     const commit = async () => {
