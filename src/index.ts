@@ -114,17 +114,20 @@ export const replacer = async (files: string[]) => {
     const handleFiles = async (callback: HandleFilesCallback) => {
         for (const filePath of fetchedFiles) {
             const output = await fileService.readFile(filePath);
-            callback(
+            callback({
                 output,
                 filePath,
-                replace({ filePath } as ReplaceProps),
-                replace({ filePath, replaceAll: true } as ReplaceProps)
-            );
+                replace: replace({ filePath } as ReplaceProps),
+                replaceAll: replace({
+                    filePath,
+                    replaceAll: true
+                } as ReplaceProps)
+            });
         }
     };
 
     const handleLines = async (callback: HandleLinesCallback) => {
-        handleFiles((output, filePath) => {
+        handleFiles(({ output, filePath }) => {
             const lines = output.split("\n");
             let lineNumber = 1;
             for (const line of lines) {

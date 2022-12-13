@@ -38,7 +38,7 @@ describe("functionality tests", () => {
             replace("first", "FIRST");
         });
 
-        handleFiles((output, filePath, replace) => {
+        handleFiles(({ replace }) => {
             replace("first", "FIRST");
         });
 
@@ -132,7 +132,7 @@ describe("basic replace tests", () => {
             const newValue = oldValue.toUpperCase();
 
             const { handleFiles, commit } = await replacer([FILE_NAME]);
-            handleFiles((output, filePath, replace) => {
+            handleFiles(({ replace }) => {
                 replace(oldValue, newValue);
             });
 
@@ -150,7 +150,7 @@ describe("basic replace tests", () => {
             const newValue = oldValue.toUpperCase();
 
             const { handleFiles, commit } = await replacer([FILE_NAME]);
-            handleFiles((output, filePath, replace, replaceAll) => {
+            handleFiles(({ replaceAll }) => {
                 replaceAll(oldValue, newValue);
             });
 
@@ -171,7 +171,7 @@ describe("basic replace tests", () => {
             const newValue2 = oldValue2.toUpperCase();
 
             const { handleFiles, commit } = await replacer([FILE_NAME]);
-            handleFiles((output, filePath, replace) => {
+            handleFiles(({ replace }) => {
                 replace(oldValue, newValue);
                 replace(oldValue2, newValue2);
             });
