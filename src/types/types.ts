@@ -7,7 +7,7 @@ export type Replacement = {
     replaceSetting: ReplaceSetting;
 };
 
-type ReplaceSetting = "replace" | "replaceAll" | "replaceLine" | "replaceFile";
+type ReplaceSetting = "replace" | "replaceAll" | "replaceWhole";
 
 export type CreateReplacementProps = {
     oldValue: string;
@@ -33,12 +33,14 @@ export type ChangedLine = {
 };
 
 export type ReplaceCallback = (oldValue: string, newValue: string) => void;
+export type ReplaceWholeCallback = (newValue: string) => void;
 
 type LineCallbackProps = {
     line: string;
     lineNumber: number;
     replace: ReplaceCallback;
     replaceAll: ReplaceCallback;
+    replaceLine: ReplaceWholeCallback;
 };
 export type HandleLinesCallback = (props: LineCallbackProps) => void;
 

@@ -41,6 +41,26 @@ export const replacer = async (files: string[]) => {
                 changedLines = changedLines.filter((i) => i !== changedLine);
             }
 
+            const replaceWhole = replaceSetting === "replaceWhole";
+            if (replaceWhole) {
+                changedLines.push({
+                    value: newValue,
+                    lineNumber,
+                    filePath
+                });
+
+                replacements.push({
+                    oldValue: alreadyModifiedValue ?? line,
+                    newValue,
+                    filePath,
+                    isLine,
+                    lineNumber,
+                    replaceSetting
+                });
+
+                return;
+            }
+
             let newLineValue = null;
             const replaceAll = replaceSetting === "replaceAll";
             if (alreadyModifiedValue) {
@@ -68,6 +88,10 @@ export const replacer = async (files: string[]) => {
                 replaceSetting
             });
         } else {
+            if (replaceSetting === "replaceWhole") {
+                throw new Error("Not implemented: replaceWhole for file");
+            }
+
             replacements.push({
                 oldValue,
                 newValue,
@@ -78,6 +102,25 @@ export const replacer = async (files: string[]) => {
             });
         }
     };
+
+    const replaceWhole =
+        ({
+            filePath,
+            line = null,
+            lineNumber = null,
+            replaceSetting = "replaceWhole"
+        }: ReplaceProps) =>
+        (newValue: string) => {
+            createReplacement({
+                oldValue: "",
+                newValue,
+                filePath,
+                isLine: line ? true : false,
+                lineNumber,
+                line,
+                replaceSetting
+            });
+        };
 
     const replace =
         ({
@@ -148,7 +191,13 @@ export const replacer = async (files: string[]) => {
                         filePath,
                         lineNumber,
                         replaceSetting: "replaceAll"
-                    })
+                    }),
+                    replaceLine: replaceWhole({
+                        line,
+                        lineNumber,
+                        filePath,
+                        replaceSetting: "replaceWhole"
+                    } as ReplaceProps)
                 });
                 lineNumber++;
             }

@@ -144,6 +144,26 @@ describe("basic replace tests", () => {
                 ORIGINAL_TEXT.replaceAll(oldValue, newValue)
             );
         });
+
+        it("should replace whole line", async () => {
+            const oldValue = "first line";
+            const newValue = oldValue.toUpperCase();
+
+            const { handleLines, commit } = await replacer([FILE_NAME]);
+            handleLines(({ replaceLine, line }) => {
+                if (line.includes(oldValue)) {
+                    replaceLine(newValue);
+                }
+            });
+
+            await commit();
+            await timeout();
+
+            expect(returnOutput).toBeTruthy();
+            expect(returnOutput).toBe(
+                ORIGINAL_TEXT.replace(oldValue, newValue)
+            );
+        });
     });
 
     describe("file", async () => {
