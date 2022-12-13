@@ -21,7 +21,7 @@ export const replacer = async (files: string[]) => {
         filePath,
         isLine,
         lineNumber = null,
-        replaceAll = false,
+        replaceSetting = "replace",
         line = null
     }: CreateReplacementProps) => {
         if (isLine) {
@@ -42,6 +42,7 @@ export const replacer = async (files: string[]) => {
             }
 
             let newLineValue = null;
+            const replaceAll = replaceSetting === "replaceAll";
             if (alreadyModifiedValue) {
                 newLineValue = replaceAll
                     ? alreadyModifiedValue.replaceAll(oldValue, newValue)
@@ -64,7 +65,7 @@ export const replacer = async (files: string[]) => {
                 filePath,
                 isLine,
                 lineNumber,
-                replaceAll
+                replaceSetting
             });
         } else {
             replacements.push({
@@ -73,7 +74,7 @@ export const replacer = async (files: string[]) => {
                 filePath,
                 isLine,
                 lineNumber,
-                replaceAll
+                replaceSetting
             });
         }
     };
@@ -83,7 +84,7 @@ export const replacer = async (files: string[]) => {
             filePath,
             line = null,
             lineNumber = null,
-            replaceAll = false
+            replaceSetting = "replace"
         }: ReplaceProps) =>
         (oldValue: string, newValue: string) => {
             if (line !== null) {
@@ -96,7 +97,7 @@ export const replacer = async (files: string[]) => {
                     isLine: true,
                     lineNumber,
                     line,
-                    replaceAll
+                    replaceSetting
                 });
             } else {
                 createReplacement({
@@ -106,7 +107,7 @@ export const replacer = async (files: string[]) => {
                     isLine: false,
                     lineNumber,
                     line,
-                    replaceAll
+                    replaceSetting
                 });
             }
         };
@@ -120,7 +121,7 @@ export const replacer = async (files: string[]) => {
                 replace: replace({ filePath } as ReplaceProps),
                 replaceAll: replace({
                     filePath,
-                    replaceAll: true
+                    replaceSetting: "replaceAll"
                 } as ReplaceProps)
             });
         }
@@ -135,17 +136,18 @@ export const replacer = async (files: string[]) => {
             for (const line of lines) {
                 callback({
                     line: line,
+                    lineNumber,
                     replace: replace({
                         line,
                         filePath,
                         lineNumber,
-                        replaceAll: false
+                        replaceSetting: "replace"
                     }),
                     replaceAll: replace({
                         line,
                         filePath,
                         lineNumber,
-                        replaceAll: true
+                        replaceSetting: "replaceAll"
                     })
                 });
                 lineNumber++;
@@ -193,7 +195,10 @@ export const replacer = async (files: string[]) => {
                         replacement.newValue
                     );
                 } else {
-                    newOutput = replacement.replaceAll
+                    const replaceAll =
+                        replacement.replaceSetting === "replaceAll";
+
+                    newOutput = replaceAll
                         ? newOutput.replaceAll(
                               replacement.oldValue,
                               replacement.newValue

@@ -4,8 +4,10 @@ export type Replacement = {
     filePath: string;
     isLine: boolean;
     lineNumber: number | null;
-    replaceAll: boolean;
+    replaceSetting: ReplaceSetting;
 };
+
+type ReplaceSetting = "replace" | "replaceAll" | "replaceLine" | "replaceFile";
 
 export type CreateReplacementProps = {
     oldValue: string;
@@ -13,7 +15,7 @@ export type CreateReplacementProps = {
     filePath: string;
     isLine: boolean;
     lineNumber: number | null;
-    replaceAll: boolean;
+    replaceSetting: ReplaceSetting;
     line: string | null;
 };
 
@@ -21,7 +23,7 @@ export type ReplaceProps = {
     filePath: string;
     line: string | null;
     lineNumber: number | null;
-    replaceAll: boolean;
+    replaceSetting: ReplaceSetting;
 };
 
 export type ChangedLine = {
@@ -34,6 +36,7 @@ export type ReplaceCallback = (oldValue: string, newValue: string) => void;
 
 type LineCallbackProps = {
     line: string;
+    lineNumber: number;
     replace: ReplaceCallback;
     replaceAll: ReplaceCallback;
 };

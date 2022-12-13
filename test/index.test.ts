@@ -80,6 +80,26 @@ describe("basic replace tests", () => {
             );
         });
 
+        it("should replace word on second line", async () => {
+            const oldValue = "second";
+            const newValue = oldValue.toUpperCase();
+
+            const { handleLines, commit } = await replacer([FILE_NAME]);
+            handleLines(({ replace, lineNumber }) => {
+                if (lineNumber === 2) {
+                    replace(oldValue, newValue);
+                }
+            });
+
+            await commit();
+            await timeout();
+
+            expect(returnOutput).toBeTruthy();
+            expect(returnOutput).toBe(
+                ORIGINAL_TEXT.replace(oldValue, newValue)
+            );
+        });
+
         it("should replace multiple words in a single line", async () => {
             const oldValue = "first";
             const newValue = oldValue.toUpperCase();
