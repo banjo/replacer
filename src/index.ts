@@ -1,12 +1,12 @@
 import {
     ChangedLine,
-    CreateReplacementProps,
     HandleFilesCallback,
     HandleLinesCallback,
     Replacement,
     ReplaceProps
 } from "./types/types";
 import { fileService } from "./services/fileService";
+import { replacementService } from "./services/replacementService";
 
 export const replacer = async (files: string[]) => {
     const fetchedFiles = await fileService.findFiles(files);
@@ -14,94 +14,8 @@ export const replacer = async (files: string[]) => {
 
     const replacements: Replacement[] = [];
 
-    let changedLines: ChangedLine[] = [];
-    const createReplacement = ({
-        oldValue,
-        newValue,
-        filePath,
-        isLine,
-        lineNumber = null,
-        replaceSetting = "replace",
-        line = null
-    }: CreateReplacementProps) => {
-        if (isLine) {
-            if (line === null || lineNumber === null) {
-                throw new Error(
-                    "Line or line number is null: " + { line, lineNumber }
-                );
-            }
-
-            const changedLine = changedLines.find(
-                (l) => l.lineNumber === lineNumber && l.filePath === filePath
-            );
-
-            let alreadyModifiedValue = null;
-            if (changedLine) {
-                alreadyModifiedValue = changedLine.value;
-                changedLines = changedLines.filter((i) => i !== changedLine);
-            }
-
-            const replaceWhole = replaceSetting === "replaceWhole";
-            if (replaceWhole) {
-                changedLines.push({
-                    value: newValue,
-                    lineNumber,
-                    filePath
-                });
-
-                replacements.push({
-                    oldValue: alreadyModifiedValue ?? line,
-                    newValue,
-                    filePath,
-                    isLine,
-                    lineNumber,
-                    replaceSetting
-                });
-
-                return;
-            }
-
-            let newLineValue = null;
-            const replaceAll = replaceSetting === "replaceAll";
-            if (alreadyModifiedValue) {
-                newLineValue = replaceAll
-                    ? alreadyModifiedValue.replaceAll(oldValue, newValue)
-                    : alreadyModifiedValue.replace(oldValue, newValue);
-            } else {
-                newLineValue = replaceAll
-                    ? line.replaceAll(oldValue, newValue)
-                    : line.replace(oldValue, newValue);
-            }
-
-            changedLines.push({
-                value: newLineValue,
-                lineNumber,
-                filePath
-            });
-
-            replacements.push({
-                oldValue: alreadyModifiedValue ?? line,
-                newValue: newLineValue,
-                filePath,
-                isLine,
-                lineNumber,
-                replaceSetting
-            });
-        } else {
-            if (replaceSetting === "replaceWhole") {
-                throw new Error("Not implemented: replaceWhole for file");
-            }
-
-            replacements.push({
-                oldValue,
-                newValue,
-                filePath,
-                isLine,
-                lineNumber,
-                replaceSetting
-            });
-        }
-    };
+    const createReplacement =
+        replacementService.createReplacementFunction(replacements);
 
     const replaceWhole =
         ({
