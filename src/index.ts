@@ -17,56 +17,24 @@ export const replacer = async (files: string[]) => {
     const createReplacement =
         replacementService.createReplacementFunction(replacements);
 
-    const replaceWhole =
-        ({
-            filePath,
-            line = null,
-            lineNumber = null,
-            replaceSetting = "replaceWhole"
-        }: ReplaceProps) =>
-        (newValue: string) => {
-            createReplacement({
-                oldValue: "",
-                newValue,
-                filePath,
-                isLine: line ? true : false,
-                lineNumber,
-                line,
-                replaceSetting
-            });
-        };
+    const replaceWhole = (props: ReplaceProps) => (newValue: string) => {
+        createReplacement({
+            oldValue: "",
+            newValue,
+            filePath: props.filePath,
+            isLine: props.line ? true : false,
+            lineNumber: props.lineNumber,
+            line: props.line,
+            replaceSetting: props.replaceSetting
+        });
+    };
 
     const replace =
-        ({
-            filePath,
-            line = null,
-            lineNumber = null,
-            replaceSetting = "replace"
-        }: ReplaceProps) =>
-        (oldValue: string, newValue: string) => {
-            if (line !== null) {
-                if (!line.includes(oldValue)) return;
+        (props: ReplaceProps) => (oldValue: string, newValue: string) => {
+            const isLine = props.line !== null && props.lineNumber !== null;
+            if (isLine && !props.line?.includes(oldValue)) return;
 
-                createReplacement({
-                    oldValue,
-                    newValue,
-                    filePath,
-                    isLine: true,
-                    lineNumber,
-                    line,
-                    replaceSetting
-                });
-            } else {
-                createReplacement({
-                    oldValue,
-                    newValue,
-                    filePath,
-                    isLine: false,
-                    lineNumber,
-                    line,
-                    replaceSetting
-                });
-            }
+            createReplacement({ ...props, isLine, oldValue, newValue });
         };
 
     const handleFiles = async (callback: HandleFilesCallback) => {
@@ -75,9 +43,16 @@ export const replacer = async (files: string[]) => {
             callback({
                 output,
                 filePath,
-                replace: replace({ filePath } as ReplaceProps),
+                replace: replace({
+                    filePath,
+                    line: null,
+                    lineNumber: null,
+                    replaceSetting: "replace"
+                } as ReplaceProps),
                 replaceAll: replace({
                     filePath,
+                    line: null,
+                    lineNumber: null,
                     replaceSetting: "replaceAll"
                 } as ReplaceProps)
             });
