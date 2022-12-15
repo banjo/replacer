@@ -53,6 +53,7 @@ export const replacer = async (files: string[]) => {
                 callback({
                     line: line,
                     lineNumber,
+                    output,
                     replace: replace({
                         line,
                         filePath,

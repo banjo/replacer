@@ -38,6 +38,7 @@ export type ReplaceWholeCallback = (newValue: string) => void;
 type LineCallbackProps = {
     line: string;
     lineNumber: number;
+    output: string;
     replace: ReplaceCallback;
     replaceAll: ReplaceCallback;
     replaceLine: ReplaceWholeCallback;
