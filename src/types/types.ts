@@ -39,6 +39,7 @@ type LineCallbackProps = {
     line: string;
     lineNumber: number;
     output: string;
+    filePath: string;
     replace: ReplaceCallback;
     replaceAll: ReplaceCallback;
     replaceLine: ReplaceWholeCallback;
