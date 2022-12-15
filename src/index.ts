@@ -6,6 +6,7 @@ import {
 } from "./types/types";
 import { fileService } from "./services/fileService";
 import { replacementService } from "./services/replacementService";
+import { saveService } from "./services/saveService";
 
 export const replacer = async (files: string[]) => {
     const fetchedFiles = await fileService.findFiles(files);
@@ -15,6 +16,7 @@ export const replacer = async (files: string[]) => {
 
     const createReplacement =
         replacementService.createReplacementFunction(replacements);
+
     const replaceWhole =
         replacementService.createReplaceWholeFunction(createReplacement);
     const replace = replacementService.createReplaceFunction(createReplacement);
@@ -74,65 +76,7 @@ export const replacer = async (files: string[]) => {
             }
         }
     };
-
-    const commit = async () => {
-        for (const filePath of fetchedFiles) {
-            const output = await fileService.readFile(filePath);
-
-            const replacementsForFile = replacements.filter(
-                (r) => r.filePath === filePath
-            );
-
-            const replacementsForFileOnly: Replacement[] = [];
-            const replacementsForLineOnly: Replacement[] = [];
-            replacementsForFile.forEach((r) => {
-                if (r.isLine) {
-                    replacementsForLineOnly.push(r);
-                } else {
-                    replacementsForFileOnly.push(r);
-                }
-            });
-
-            if (
-                replacementsForFileOnly.length > 0 &&
-                replacementsForLineOnly.length > 0
-            ) {
-                throw new Error(
-                    "Cannot have both line and file replacements in one commit. If you want to replace whole file, use handleFiles instead of handleLines."
-                );
-            }
-
-            const selectedReplacements =
-                replacementsForFileOnly.length > 0
-                    ? replacementsForFileOnly
-                    : replacementsForLineOnly;
-
-            let newOutput = output;
-            for (const replacement of selectedReplacements) {
-                if (replacement.isLine) {
-                    newOutput = newOutput.replace(
-                        replacement.oldValue,
-                        replacement.newValue
-                    );
-                } else {
-                    const replaceAll =
-                        replacement.replaceSetting === "replaceAll";
-
-                    newOutput = replaceAll
-                        ? newOutput.replaceAll(
-                              replacement.oldValue,
-                              replacement.newValue
-                          )
-                        : newOutput.replace(
-                              replacement.oldValue,
-                              replacement.newValue
-                          );
-                }
-            }
-
-            await fileService.writeFile(filePath, newOutput);
-        }
-    };
+    const commit = saveService.createCommitFunction(fetchedFiles, replacements);
 
     return { handleFiles, handleLines, files: fetchedFiles, commit };
 };
