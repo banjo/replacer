@@ -1,4 +1,8 @@
-import { CreateReplacementProps, ChangedLine } from "./../types/types";
+import {
+    CreateReplacementProps,
+    ChangedLine,
+    ReplaceProps
+} from "./../types/types";
 import { Replacement } from "../types/types";
 
 const handleLine = (
@@ -117,4 +121,31 @@ const createReplacementFunction = (replacements: Replacement[]) => {
     };
     return createReplacement;
 };
-export const replacementService = { createReplacementFunction };
+const createReplaceWholeFunction =
+    (createReplacement: any) => (props: ReplaceProps) => (newValue: string) => {
+        createReplacement({
+            oldValue: "",
+            newValue,
+            filePath: props.filePath,
+            isLine: props.line ? true : false,
+            lineNumber: props.lineNumber,
+            line: props.line,
+            replaceSetting: props.replaceSetting
+        });
+    };
+
+const createReplaceFunction =
+    (createReplacement: any) =>
+    (props: ReplaceProps) =>
+    (oldValue: string, newValue: string) => {
+        const isLine = props.line !== null && props.lineNumber !== null;
+        if (isLine && !props.line?.includes(oldValue)) return;
+
+        createReplacement({ ...props, isLine, oldValue, newValue });
+    };
+
+export const replacementService = {
+    createReplacementFunction,
+    createReplaceWholeFunction,
+    createReplaceFunction
+};

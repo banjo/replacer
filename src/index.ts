@@ -1,5 +1,4 @@
 import {
-    ChangedLine,
     HandleFilesCallback,
     HandleLinesCallback,
     Replacement,
@@ -16,26 +15,9 @@ export const replacer = async (files: string[]) => {
 
     const createReplacement =
         replacementService.createReplacementFunction(replacements);
-
-    const replaceWhole = (props: ReplaceProps) => (newValue: string) => {
-        createReplacement({
-            oldValue: "",
-            newValue,
-            filePath: props.filePath,
-            isLine: props.line ? true : false,
-            lineNumber: props.lineNumber,
-            line: props.line,
-            replaceSetting: props.replaceSetting
-        });
-    };
-
-    const replace =
-        (props: ReplaceProps) => (oldValue: string, newValue: string) => {
-            const isLine = props.line !== null && props.lineNumber !== null;
-            if (isLine && !props.line?.includes(oldValue)) return;
-
-            createReplacement({ ...props, isLine, oldValue, newValue });
-        };
+    const replaceWhole =
+        replacementService.createReplaceWholeFunction(createReplacement);
+    const replace = replacementService.createReplaceFunction(createReplacement);
 
     const handleFiles = async (callback: HandleFilesCallback) => {
         for (const filePath of fetchedFiles) {
