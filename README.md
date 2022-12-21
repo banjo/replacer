@@ -14,6 +14,8 @@ npm i @banjoanton/replacer
 ```
 
 ```ts
+import { replacer } from "@banjoanton/replacer";
+
 const { handleFiles, handleLines, commit } = await replacer(["/path/to/file", "/path/to/another/file"]);
 
 // loop through each file
