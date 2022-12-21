@@ -10,6 +10,10 @@ Simple API to replace text in multiple text files.
 ## Get started
 
 ```ts
+npm i @banjoanton/replacer
+```
+
+```ts
 const { handleFiles, handleLines, commit } = await replacer(["/path/to/file", "/path/to/another/file"]);
 
 // loop through each file
